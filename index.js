@@ -4,7 +4,11 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const http = require("http");
 const socketIo = require("socket.io");
-require("dotenv").config(); // Load environment variables
+const connectDB = require("./config/db"); // Database connection
+const loadEnv = require("./config/env"); // Load environment variables
+
+// Load environment variables
+loadEnv();
 
 // Route Imports
 const authRoutes = require("./routes/authRoutes");
@@ -16,19 +20,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 // Initialize Express app
 const app = express();
 
-// Database Connection
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.DB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error(error.message);
-    process.exit(1);
-  }
-};
+// Connect to Database
 connectDB();
 
 // Middleware
@@ -52,6 +44,10 @@ io.on("connection", (socket) => {
     console.log("Client disconnected");
   });
 });
+
+// Error handling middleware
+const errorHandler = require("./middlewares/errorHandler");
+app.use(errorHandler);
 
 // Server Listener
 const PORT = process.env.PORT || 5000;
