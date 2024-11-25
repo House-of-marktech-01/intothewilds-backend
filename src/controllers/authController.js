@@ -7,14 +7,13 @@ const generateToken = (user) => {
   });
 };
 
-//register controller
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: "User already exists" });
 
-    user = new User({ name, email, password, role });
+    user = new User({ name, email, password });
     await user.save();
 
     const token = generateToken(user);
@@ -29,7 +28,6 @@ exports.register = async (req, res) => {
   }
 };
 
-//login controller
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -1,67 +1,132 @@
-const Booking = require('../models/Booking');
-const Room = require('../models/Room');
-const Razorpay = require('razorpay');
-require('dotenv').config();
+// const Booking = require('../models/Booking');
+// const Inventory = require('../models/Inventory');
+// const User = require('../models/User');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_SECRET_KEY,
-});
+// exports.createBooking = async (req, res) => {
+//     try {
+//         const { userId, roomId, checkInDate, checkOutDate, guests, specialRequests } = req.body;
 
-// Create a new booking
-exports.createBooking = async (req, res) => {
-  try {
-    const { user, room, checkInDate, checkOutDate } = req.body;
+//         if (new Date(checkInDate) >= new Date(checkOutDate)) {
+//             return res.status(400).json({ message: 'Check-out date must be after check-in date.' });
+//         }
 
-    const roomDetails = await Room.findById(room)
-    if (!roomDetails || !roomDetails.availability) {
-      return res.status(400).json({ error: 'Room not available.' });
-    }
+//         const room = await Inventory.findById(roomId);
+//         if (!room || !room.availabilityStatus) {
+//             return res.status(400).json({ message: 'Room is not available for booking.' });
+//         }
 
-    const newBooking = new Booking({ user, room, checkInDate, checkOutDate });
-    await newBooking.save();
+//         const diffTime = new Date(checkOutDate) - new Date(checkInDate);
+//         const numNights = diffTime / (1000 * 3600 * 24); // Convert time to days
 
-    res.status(201).json({ message: 'Booking created successfully!', booking: newBooking });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//         if (numNights <= 0) {
+//             return res.status(400).json({ message: 'Invalid dates. Check-out must be later than check-in.' });
+//         }
 
-// View all bookings
-exports.getBookings = async (req, res) => {
-  try {
-    const bookings = await Booking.find().populate('user room');
-    res.status(200).json(bookings);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//         const totalAmount = room.ratePerNight * numNights * guests;
 
-// Update booking status
-exports.updateBookingStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
+//         // Create the booking
+//         const newBooking = new Booking({
+//             userId,
+//             roomId,
+//             checkInDate,
+//             checkOutDate,
+//             guests,
+//             totalAmount,
+//             specialRequests,
+//             bookingStatus: 'pending',
+//             paymentStatus: 'unpaid'
+//         });
 
-    const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
-    if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+//         await newBooking.save();
 
-    res.status(200).json({ message: 'Booking updated successfully!', booking });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//         // Update room availability
+//         room.availabilityStatus = false;  // Mark the room as unavailable
+//         await room.save();
 
-// Cancel booking
-exports.cancelBooking = async (req, res) => {
-  try {
-    const { id } = req.params;
+//         return res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ message: 'Failed to create booking', error: error.message });
+//     }
+// };
 
-    const booking = await Booking.findByIdAndDelete(id);
-    if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+// // Get all bookings for a user
+// exports.getUserBookings = async (req, res) => {
+//     try {
+//         const { userId } = req.params;
 
-    res.status(200).json({ message: 'Booking cancelled successfully!' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+//         const bookings = await Booking.find({ userId }).populate('roomId').populate('userId');
+
+//         if (!bookings || bookings.length === 0) {
+//             return res.status(404).json({ message: 'No bookings found for this user.' });
+//         }
+
+//         return res.status(200).json(bookings);
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ message: 'Failed to fetch bookings', error: error.message });
+//     }
+// };
+
+// // Update booking status
+// exports.updateBookingStatus = async (req, res) => {
+//     try {
+//         const { bookingId } = req.params;
+//         const { bookingStatus, paymentStatus } = req.body;
+
+//         const booking = await Booking.findById(bookingId);
+
+//         if (!booking) {
+//             return res.status(404).json({ message: 'Booking not found.' });
+//         }
+
+//         booking.bookingStatus = bookingStatus || booking.bookingStatus;
+//         booking.paymentStatus = paymentStatus || booking.paymentStatus;
+
+//         await booking.save();
+
+//         return res.status(200).json({ message: 'Booking status updated successfully', booking });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ message: 'Failed to update booking status', error: error.message });
+//     }
+// };
+
+// // Delete a booking
+// exports.deleteBooking = async (req, res) => {
+//     try {
+//         const { bookingId } = req.params;
+
+//         const booking = await Booking.findByIdAndDelete(bookingId);
+
+//         if (!booking) {
+//             return res.status(404).json({ message: 'Booking not found.' });
+//         }
+
+//         // Update room availability
+//         const room = await Inventory.findById(booking.roomId);
+//         room.availabilityStatus = true; // Mark the room as available again
+//         await room.save();
+
+//         return res.status(200).json({ message: 'Booking deleted successfully' });
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ message: 'Failed to delete booking', error: error.message });
+//     }
+// };
+
+// // Get all bookings (admin)
+// exports.getAllBookings = async (req, res) => {
+//     try {
+//         const bookings = await Booking.find().populate('roomId').populate('userId');
+
+//         if (!bookings || bookings.length === 0) {
+//             return res.status(404).json({ message: 'No bookings found.' });
+//         }
+
+//         return res.status(200).json(bookings);
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({ message: 'Failed to fetch bookings', error: error.message });
+//     }
+// };
