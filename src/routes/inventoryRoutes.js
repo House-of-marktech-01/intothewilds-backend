@@ -1,23 +1,9 @@
-const express = require('express');
+const express = require("express");
+const inventoryController = require("../controllers/inventoryController");
+
 const router = express.Router();
-const inventoryController = require('../controllers/inventoryController');
-
-// Route to create a new room
-router.post('/create', inventoryController.createRoom);
-
-// Route to get all rooms in the inventory
-router.get('/', inventoryController.getAllRooms);
-
-// Route to get room details by room number
-router.get('/:roomNumber', inventoryController.getRoomByNumber);
-
-// Route to update room details by room number
-router.put('/:roomNumber', inventoryController.updateRoom);
-
-// Route to delete a room by room number
-router.delete('/:roomNumber', inventoryController.deleteRoom);
-
-// Route to update room availability by room number
-router.put('/:roomNumber/availability', inventoryController.updateRoomAvailability);
-
+router.post("/create-room", inventoryController.createRoom);
+router.get("/get-inventory", inventoryController.getInventory);
+router.put("/update-room/:roomId", inventoryController.updateRoom);
+router.delete("/remove-room/:roomId", inventoryController.removeRoom);
 module.exports = router;

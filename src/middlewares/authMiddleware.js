@@ -1,32 +1,32 @@
-// authMiddleware.js
-const jwt = require("jsonwebtoken");
+// server/middleware/authMiddleware.js
+const jwt = require('jsonwebtoken');
+require(dotenv).coniig();
 
-exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
+// Authenticate token
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Access denied' });
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Access denied. No token provided." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: err.message });
+    req.user = user;
     next();
-  } catch (error) {
-    res.status(400).json({ message: "Invalid token." });
-  }
+  });
 };
 
-// Middleware to check user roles
-exports.checkRole = (roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({ message: "Access denied. Insufficient permissions." });
+
+
+
+// Check user role
+const authorizeRole = (role) => {
+  return (req, res, next,err) => {
+    if (req.user.role !== role) {
+      return res.status(403).json({ error: err.message});
     }
     next();
   };
 };
+
+module.exports = { authenticateToken, authorizeRole };
+// module.exports = { authenticateToken};
+    
