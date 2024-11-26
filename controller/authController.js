@@ -4,8 +4,8 @@ const User = require('../models/User');
 //register user
 exports.register = async (req,res)=>{
   try {
-    const { email, password, role } = req.body;
-    const user = new User({ email, password, role });
+    const { email, password, name } = req.body;
+    const user = new User({ email, password, name });
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -13,6 +13,7 @@ exports.register = async (req,res)=>{
   }
 };
 
+//login user
 exports.login = async (req,res)=>{
   try {
     const { email, password } = req.body;
