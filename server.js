@@ -4,10 +4,13 @@ const connectToMongo = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const inventoryRoutes = require('./routes/inventoryRoute');
 const bookingRoutes = require('./routes/bookingRoute');
+const cors = require("cors");
 
-dotenv.config();
 
 const app = express();
+
+app.use(cors());
+dotenv.config();
 connectToMongo();
 
 //middlewares
