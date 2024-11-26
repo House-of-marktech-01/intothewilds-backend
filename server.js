@@ -4,13 +4,20 @@ const connectToMongo = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const inventoryRoutes = require("./routes/inventoryRoute");
 const bookingRoutes = require("./routes/bookingRoute");
-const cors = require("cors");
+
+const cors = require("cors"); // Add this line
+
+dotenv.config();
 
 const app = express();
 
-app.use(cors());
-
-dotenv.config();
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Your frontend's exact origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  })
+);
 connectToMongo();
 
 //middlewares
