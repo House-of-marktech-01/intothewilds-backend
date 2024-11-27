@@ -21,6 +21,18 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user',
   },
+  isVerified: { 
+    type: Boolean, 
+    default: false 
+  },
+  otp: {
+    type: String, // Store OTP as a string
+    required: false,
+  },
+  otpGeneratedAt: {
+    type: Date, // Store the time when OTP was generated
+    required: false,
+  },
 });
 
 // Hash password before saving the user
