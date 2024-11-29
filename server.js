@@ -4,6 +4,7 @@ const connectToMongo = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const inventoryRoutes = require("./routes/inventoryRoute");
 const bookingRoutes = require("./routes/bookingRoute");
+const morgan = require("morgan");
 
 const cors = require("cors"); // Add this line
 
@@ -12,6 +13,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
+app.use(morgan("tiny"));
 connectToMongo();
 
 //middlewares
