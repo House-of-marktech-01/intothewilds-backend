@@ -20,6 +20,7 @@ app.use(cors());
 app.use(morgan("tiny"));
 connectToMongo();
 
+
 //middlewares
 app.use(express.json()); //parse json bodies
 
