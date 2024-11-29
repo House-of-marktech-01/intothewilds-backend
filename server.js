@@ -6,7 +6,11 @@ const inventoryRoutes = require("./routes/inventoryRoute");
 const bookingRoutes = require("./routes/bookingRoute");
 const morgan = require("morgan");
 
-const cors = require("cors"); // Add this line
+const cors = require("cors",{
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],
+    credentials: true,
+}); // Add this line
 
 dotenv.config();
 
