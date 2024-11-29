@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 connectToMongo();
 
+
 //middlewares
 app.use(express.json()); //parse json bodies
 
