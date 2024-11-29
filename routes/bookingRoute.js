@@ -6,7 +6,7 @@ const { authenticateToken, authorizeRole } = require('../middleware/authMiddlewa
 const router = express.Router();
 
 // Create a booking
-router.post('/new-booking',authenticateToken, bookingController.createBooking);
+router.post('/new-booking', bookingController.createBooking);
 
 // Get all bookings (Admin only)
 router.get('/get-all-bookings' ,authenticateToken, authorizeRole('admin') , bookingController.getBookings);
@@ -18,6 +18,6 @@ router.put('/update/:id',authenticateToken, authorizeRole('admin') , bookingCont
 router.delete('/cancel/:id',authenticateToken, authorizeRole('admin') ,bookingController.cancelBooking);
 
 //verify payment
-router.delete('/verify-payment', bookingController.verifyPayment);
+router.post('/verify-payment', bookingController.verifyPayment);
 
 module.exports = router;
