@@ -130,3 +130,13 @@ exports.cancelBooking = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getAllBookings=async(req,res)=>{
+  try{
+    const bookings=await Booking.find();
+    res.status(200).json({success:true,bookings});
+  }
+  catch(err){
+    res.status(500).json({error:err.message});
+  }
+}

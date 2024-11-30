@@ -20,4 +20,6 @@ router.delete('/cancel/:id',authenticateToken, authorizeRole('admin') ,bookingCo
 //verify payment
 router.post('/verify-payment', bookingController.verifyPayment);
 
+router.get('/getBookings',bookingController.getAllBookings);
+
 module.exports = router;
