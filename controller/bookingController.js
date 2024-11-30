@@ -133,8 +133,20 @@ exports.cancelBooking = async (req, res) => {
 
 exports.getAllBookings=async(req,res)=>{
   try{
-    const bookings=await Booking.find();
+    const bookings=await Booking.find().populate('user');
     res.status(200).json({success:true,bookings});
+  }
+  catch(err){
+    res.status(500).json({error:err.message});
+  }
+}
+
+exports.updateBookingStatus=async(req,res)=>{
+  try{
+    const {id}=req.params;
+    if(!id) return res.status(400).json({error:"Booking ID is required"});
+    const booking=await Booking.findByIdAndUpdate(id,{$set:{status:req.body.status}},{new:true});
+    res.status(200).json({message:"Booking status updated successfully",booking});
   }
   catch(err){
     res.status(500).json({error:err.message});

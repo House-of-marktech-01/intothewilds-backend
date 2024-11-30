@@ -15,11 +15,14 @@ router.get('/get-all-bookings' ,authenticateToken, authorizeRole('admin') , book
 router.put('/update/:id',authenticateToken, authorizeRole('admin') , bookingController.updateBookingStatus);
 
 // Cancel a booking (admin only)
-router.delete('/cancel/:id',authenticateToken, authorizeRole('admin') ,bookingController.cancelBooking);
+router.delete('/cancel/:id' ,bookingController.cancelBooking);
 
 //verify payment
 router.post('/verify-payment', bookingController.verifyPayment);
 
 router.get('/getBookings',bookingController.getAllBookings);
+
+// Update booking status (admin only)
+router.post('/:id/status', bookingController.updateBookingStatus);
 
 module.exports = router;
