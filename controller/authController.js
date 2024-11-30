@@ -12,11 +12,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// // Generate email verification token
-// const generateVerificationToken = (userId) => {
-//   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
-// };
-
 // Generate OTP
 const generateOTP = () => {
   // Generate a 6-digit OTP
@@ -46,11 +41,6 @@ exports.register = async (req, res) => {
     user.otp = otp;
     await user.save();
 
-    // Generate verification token
-    // const token = generateVerificationToken(user._id);
-
-    // Send verification email
-    // const verificationUrl = `http://yourwebsite.com/verify-email?token=${token}`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -98,30 +88,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// // Verify email
-// exports.verifyEmail = async (req, res) => {
-//   try {
-//     const { token } = req.query;
-
-//     // Verify and decode the token
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//     // Find and update the user
-//     const user = await User.findByIdAndUpdate(
-//       decoded.id,
-//       { isVerified: true },
-//       { new: true }
-//     );
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found.' });
-//     }
-
-//     res.status(200).json({ message: 'Email verified successfully.' });
-//   } catch (error) {
-//     res.status(400).json({ error: 'Invalid or expired token.' });
-//   }
-// };
 
 // Verify OTP
 exports.verifyEmail = async (req, res) => {
