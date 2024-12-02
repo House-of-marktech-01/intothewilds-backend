@@ -16,6 +16,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+    default: "https://www.gravatar.com/avatar/"
+  },
+  phone:{
+    type: Number,
+  },
+  gender:{
+    type: String,
+    enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
+    default: 'Prefer not to say',
+  },
   role: {
     type: String,
     enum: ["user", "admin"],
