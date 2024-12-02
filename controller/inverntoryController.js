@@ -1,4 +1,5 @@
 const Room = require("../models/Room");
+const Booking = require("../models/Booking");
 
 
 // Create a room
@@ -16,8 +17,18 @@ exports.createRoom = async (req, res) => {
 //get-inventory
 exports.getInventory = async (req, res) => {
     try {
+      const {userId} = req.query;
       const inventory = await Room.find();
-      res.status(200).json(inventory);
+      if(!userId){
+        return res.status(200).json(inventory);
+      }
+      const bookings = await Booking.find({user:userId,room:{$exists:true}});
+      // Filter out rooms that are in bookings
+      const availableRooms = inventory.filter(room => {
+        return !bookings.some(booking => booking.room.toString() === room._id.toString());
+      });
+
+      res.status(200).json(availableRooms);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
