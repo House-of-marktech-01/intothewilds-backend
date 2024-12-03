@@ -26,6 +26,7 @@ connectToMongo();
 app.use(express.json()); //parse json bodies
 
 //routes
+app.get('/', (req, res) => {res.send('ITW Backend is running!')});
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
 app.use("/api/v1/booking", bookingRoutes);
