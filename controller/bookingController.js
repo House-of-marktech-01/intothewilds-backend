@@ -13,7 +13,7 @@ const razorpay = new Razorpay({
 // Create a new booking and Razorpay order
 exports.createBooking = async (req, res) => {
   try {
-    const { user, checkInDate, checkOutDate, amount, property, tour } = req.body;
+    const { user, checkInDate, checkOutDate, amount, property, tour ,adults,children} = req.body;
     
     if(property) {
       const propertyDetails = await Property.findById(property);
@@ -55,6 +55,8 @@ exports.createBooking = async (req, res) => {
         user,
         checkInDate,
         checkOutDate,
+        children,
+        adults,
         amount,
         razorpayOrderId: order.id,
         razorpayPaymentId: null,

@@ -4,6 +4,8 @@ const bookingSchema = new mongoose.Schema({
   checkInDate: { type: Date },
   checkOutDate: { type: Date },
   amount: { type: Number },
+  adults: { type: Number, default: 0 },
+  children: { type: Number, default: 0 },
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },
   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
