@@ -4,11 +4,20 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 require('dotenv').config();
 const Property = require('../models/Properties');
+const nodemailer = require('nodemailer');
 
 const razorpay = new Razorpay({
   key_id:"rzp_test_S7O9aeETo3NXrl",
   key_secret:"f0Intwdd1mbIxnqEEAWhqL8k",
 }); 
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // Create a new booking and Razorpay order
 exports.createBooking = async (req, res) => {
@@ -80,8 +89,7 @@ exports.createBooking = async (req, res) => {
 // Verify payment and update booking status
 exports.verifyPayment = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature,bookingId } = req.body;
-    console.log(razorpay_order_id, razorpay_payment_id, razorpay_signature,bookingId);
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, bookingId } = req.body;
     
     // Generate the expected signature
     // const generatedSignature = crypto
@@ -98,11 +106,47 @@ exports.verifyPayment = async (req, res) => {
     //   );
 
     //   if (!booking) return res.status(404).json({ error: 'Booking not found.' });
-      const booking = await Booking.findById(bookingId);
+      const booking = await Booking.findById(bookingId)
+        .populate('user')
+        .populate('property');
+      
       if(!booking) return res.status(404).json({ error: 'Booking not found.' });
+      
       booking.status = 'confirmed';
       booking.razorpayPaymentId = razorpay_payment_id;
       await booking.save();
+
+      // Send confirmation email
+      const emailContent = `
+        <h2>Booking Confirmation</h2>
+        <p>Dear ${booking.user.name},</p>
+        <p>Your booking has been confirmed. Here are the details:</p>
+        <h3>Booking Details:</h3>
+        <ul>
+          <li>Check-in Date: ${new Date(booking.checkInDate).toLocaleDateString()}</li>
+          <li>Check-out Date: ${new Date(booking.checkOutDate).toLocaleDateString()}</li>
+          <li>Amount Paid: ₹${booking.amount}</li>
+          <li>Number of Adults: ${booking.adults}</li>
+          <li>Number of Children: ${booking.children}</li>
+          <li>Payment ID: ${booking.razorpayPaymentId}</li>
+        </ul>
+        
+        <h3>Property Details:</h3>
+        <ul>
+          <li>Property Name: ${booking.property.name}</li>
+          <li>Location: ${booking.property.location}</li>
+        </ul>
+        
+        <p>Thank you for choosing our service!</p>
+      `;
+
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: booking.user.email,
+        subject: 'Booking Confirmation - Into The Wilds',
+        html: emailContent,
+      });
+
       res.status(200).json({
         message: 'Payment verified successfully, booking confirmed!',
         booking,
