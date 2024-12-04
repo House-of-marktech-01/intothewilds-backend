@@ -3,6 +3,7 @@ const Room = require('../models/Room');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 require('dotenv').config();
+const Property = require('../models/Properties');
 
 const razorpay = new Razorpay({
   key_id:"rzp_test_S7O9aeETo3NXrl",
@@ -12,17 +13,35 @@ const razorpay = new Razorpay({
 // Create a new booking and Razorpay order
 exports.createBooking = async (req, res) => {
   try {
-    const { user, checkInDate, checkOutDate, amount } = req.body;
-    console.log(user, checkInDate, checkOutDate, amount);
-    // Check room availability
-    // const roomDetails = await Room.findById(room);
-    // if (!roomDetails || !roomDetails.availability) {
-    //   return res.status(400).json({ error: 'Room not available.' });
-    // }
+    const { user, checkInDate, checkOutDate, amount, property, tour } = req.body;
+    
+    if(property) {
+      const propertyDetails = await Property.findById(property);
+      if(!propertyDetails) return res.status(400).json({error: "Property not found"});
+      
+      const existingBookings = await Booking.find({
+        property: property,
+        status: 'confirmed',
+        $or: [
+          {
+            checkInDate: { $lt: checkOutDate },
+            checkOutDate: { $gt: checkInDate }
+          }
+        ]
+      });
 
-    // Create Razorpay order
+      const bookedRoomsCount = existingBookings.length;
+      
+      if (bookedRoomsCount >= propertyDetails.bedroom) {
+        return res.status(400).json({
+          success:false,
+          message: "No rooms available for the selected dates"
+        });
+      }
+    }
+
     const options = {
-      amount: amount * 100, // Amount in the smallest currency unit (e.g., paise for INR)
+      amount: amount * 100, 
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
     };
@@ -39,6 +58,8 @@ exports.createBooking = async (req, res) => {
         amount,
         razorpayOrderId: order.id,
         razorpayPaymentId: null,
+        property,
+        tour,
       });
       await newBooking.save();
       res.status(201).json({
@@ -147,6 +168,17 @@ exports.updateBookingStatus=async(req,res)=>{
     if(!id) return res.status(400).json({error:"Booking ID is required"});
     const booking=await Booking.findByIdAndUpdate(id,{$set:{status:req.body.status}},{new:true});
     res.status(200).json({message:"Booking status updated successfully",booking});
+  }
+  catch(err){
+    res.status(500).json({error:err.message});
+  }
+}
+
+exports.getBookingByUserId=async(req,res)=>{
+  try{
+    const {id}=req.params;
+    const bookings=await Booking.find({user:id});
+    res.status(200).json({success:true,bookings});
   }
   catch(err){
     res.status(500).json({error:err.message});

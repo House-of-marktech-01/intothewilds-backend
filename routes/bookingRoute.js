@@ -21,7 +21,7 @@ router.delete('/cancel/:id' ,bookingController.cancelBooking);
 router.post('/verify-payment', bookingController.verifyPayment);
 
 router.get('/getBookings',bookingController.getAllBookings);
-
+router.get('/getBookings/:id',bookingController.getBookingByUserId);
 // Update booking status (admin only)
 router.post('/:id/status', bookingController.updateBookingStatus);
 

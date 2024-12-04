@@ -8,5 +8,7 @@ const bookingSchema = new mongoose.Schema({
   razorpayPaymentId: { type: String },
   status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
   Date: { type: Date, default: Date.now },
+  property: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
+  tour: { type: String },
 });
 module.exports = mongoose.model('Booking', bookingSchema);
