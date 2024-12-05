@@ -25,7 +25,7 @@ const authenticateToken = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
-        console.log('JWT Verification Error:', err);
+        // console.log('JWT Verification Error:', err);
         return res.status(401).json({ 
           error: { 
             code: 'BAD_REQUEST_ERROR',
@@ -37,7 +37,7 @@ const authenticateToken = (req, res, next) => {
       next();
     });
   } catch (error) {
-    console.log('Auth Middleware Error:', error);
+    // console.log('Auth Middleware Error:', error);
     return res.status(500).json({ 
       error: { 
         code: 'SERVER_ERROR',
