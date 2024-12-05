@@ -12,5 +12,6 @@ const bookingSchema = new mongoose.Schema({
   Date: { type: Date, default: Date.now },
   property: { type: mongoose.Schema.Types.ObjectId, ref: 'Property' },
   tour: { type: String },
+  roomBooked:{type:Number,default:0}
 });
 module.exports = mongoose.model('Booking', bookingSchema);

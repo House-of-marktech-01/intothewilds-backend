@@ -23,11 +23,16 @@ const transporter = nodemailer.createTransport({
 exports.createBooking = async (req, res) => {
   try {
     const { user, checkInDate, checkOutDate, amount, property, tour ,adults,children} = req.body;
-    
+    //  console.log(req.body); 
+     let roomBooked=0;
+     let totalguest=0;
     if(property) {
       const propertyDetails = await Property.findById(property);
+      // console.log(propertyDetails);
       if(!propertyDetails) return res.status(400).json({error: "Property not found"});
       
+      totalguest = Number(adults) + Number(children);
+      roomBooked = Math.ceil(totalguest / propertyDetails.guestCapacity);
       const existingBookings = await Booking.find({
         property: property,
         status: 'confirmed',
@@ -39,12 +44,12 @@ exports.createBooking = async (req, res) => {
         ]
       });
 
-      const bookedRoomsCount = existingBookings.length;
-      
-      if (bookedRoomsCount >= propertyDetails.bedroom) {
+      // Calculate total booked rooms from existing bookings
+      const bookedRoomsCount = existingBookings.reduce((total, booking) => total + booking.roomBooked, 0);
+      if (bookedRoomsCount + roomBooked > propertyDetails.bedroom) {
         return res.status(400).json({
-          success:false,
-          message: "No rooms available for the selected dates"
+          success: false,
+          message: "Not enough rooms available for the selected guest sizes and dates"
         });
       }
     }
@@ -71,6 +76,7 @@ exports.createBooking = async (req, res) => {
         razorpayPaymentId: null,
         property,
         tour,
+        roomBooked
       });
       await newBooking.save();
       res.status(201).json({

@@ -25,6 +25,9 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  address:{
+    type:String,
+  },
   price: {
     type: Number,
     required: true
@@ -33,9 +36,16 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  guest: {
+  guestCapacity: {
     type: Number,
     required: true
+  },
+  maximumCapacity:{
+    type: Number,
+    required: true
+  },
+  locationlink:{
+    type:String,
   },
   tags: {
     type: [String],
