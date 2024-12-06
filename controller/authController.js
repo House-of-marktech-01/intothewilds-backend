@@ -26,7 +26,13 @@ exports.register = async (req, res) => {
     }
     // console.log(req.body);
     // Check if the email already exists
-    const existingUser = await User.findOne({ $or: [{ email: emailorphone }, { phone: emailorphone }] });
+    let existingUser;
+    if(emailorphone.includes("@")){
+      existingUser = await User.findOne({ email: emailorphone });
+    }
+    else{
+      existingUser = await User.findOne({ phone: emailorphone });
+    }
     if (existingUser) {
       if (existingUser.email === emailorphone) {
         return res.status(400).json({ error: 'Email is already registered.' });
@@ -108,10 +114,17 @@ exports.login = async (req, res) => {
     const { emailorphone, password } = req.body;
     // console.log(req.body);
     if (!emailorphone || !password) {
+      console.log("All fields are required");
       return res.status(400).json({ error: "All fields are required" });
     }
     // Find the user
-    const user = await User.findOne({ $or: [{ email: emailorphone }, { phone: emailorphone }] });
+    let user;
+    if(emailorphone.includes("@")){
+      user = await User.findOne({ email: emailorphone });
+    }
+    else{
+      user = await User.findOne({ phone: emailorphone });
+    }
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -130,6 +143,7 @@ exports.login = async (req, res) => {
     const { _id, name, email: userEmail, phone, role } = user;
     res.json({ token, user: { _id, name, userEmail, phone, role } });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -138,10 +152,17 @@ exports.login = async (req, res) => {
 // Verify OTP
 exports.verifyEmail = async (req, res) => {
   try {
-    const { email, otp } = req.body;  // OTP should be sent in the request body along with email
+    const { emailorphone, otp } = req.body;  // OTP should be sent in the request body along with email
 
     // Find the user by email
-    const user = await User.findOne({ email });
+    console.log(emailorphone, otp);
+    let user;
+    if(emailorphone.includes("@")){
+      user = await User.findOne({ email: emailorphone });
+    }
+    else{
+      user = await User.findOne({ phone: emailorphone });
+    }
 
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
@@ -149,6 +170,10 @@ exports.verifyEmail = async (req, res) => {
 
     // Check if the OTP matches and is still valid (e.g., within 10 minutes)
     if (user.otp !== otp) {
+      console.log(user);
+      console.log(user.otp, otp);
+      console.log("Invalid OTP");
+
       return res.status(400).json({ error: 'Invalid OTP.' });
     }
 
@@ -176,6 +201,7 @@ exports.verifyEmail = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: 'Invalid request.' });
   }
 };
@@ -196,6 +222,7 @@ exports.googleSignup = async (req, res) => {
     const clientId = response.clientId;
     const clientCredentials = response.credential;
     const user = await User.findOne({ clientId: clientId });
+    console.log(user);
     if (user) {
       const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
       return res.status(200).json({
@@ -244,36 +271,3 @@ exports.googleSignup = async (req, res) => {
   }
 }
 
-exports.googleLogin = async (req, res) => {
-  try {
-    const response = req.body;
-    const clientId = response.clientId;
-    const user = await User.findOne({ clientId: clientId });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({
-      success: true,
-      token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        avatar: user.avatar,
-        role: user.role,
-      },
-      message: "Logged in successfully"
-    });
-  }
-  catch (err) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-}
