@@ -168,7 +168,7 @@ exports.verifyPayment = async (req, res) => {
 // View all bookings
 exports.getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find().populate('user room');
+    const bookings = await Booking.find().populate('user property');
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -206,7 +206,7 @@ exports.cancelBooking = async (req, res) => {
 
 exports.getAllBookings=async(req,res)=>{
   try{
-    const bookings=await Booking.find().populate('user');
+    const bookings=await Booking.find().populate('user').populate('property');
     res.status(200).json({success:true,bookings});
   }
   catch(err){

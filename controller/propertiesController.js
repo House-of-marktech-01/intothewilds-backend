@@ -19,7 +19,15 @@ const getPropertyById = async (req, res) => {
     }
 };
 
+const editProperty = async (req, res) => {
+    const { id } = req.params;
+    const { name, price,guestCapacity ,maximumCapacity} = req.body;
+    const property = await Properties.findByIdAndUpdate(id, { name, price,guestCapacity ,maximumCapacity});
+    res.status(200).json({ message: "Property updated successfully", property: property });
+};
+
 module.exports = {
     getProperties,
-    getPropertyById
+    getPropertyById,
+    editProperty
 };
