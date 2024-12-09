@@ -21,6 +21,7 @@ const generateOTP = () => {
 exports.register = async (req, res) => {
   try {
     const { emailorphone, password, name } = req.body;
+    // console.log(req.body);
     if (!emailorphone || !password || !name) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -33,6 +34,7 @@ exports.register = async (req, res) => {
     else{
       existingUser = await User.findOne({ phone: emailorphone });
     }
+    // console.log(existingUser);
     if (existingUser) {
       if (existingUser.email === emailorphone) {
         return res.status(400).json({ error: 'Email is already registered.' });
@@ -46,8 +48,9 @@ exports.register = async (req, res) => {
     const email = emailorphone.includes("@") ? emailorphone : null;
     const phone = emailorphone.includes("@") ? null : emailorphone;
     const user = new User({ email, phone, password, name, isVerified: false });
+    // console.log(user);
     await user.save();
-
+    // console.log(user);
     // Generate OTP
     const otp = generateOTP();
 
@@ -88,6 +91,8 @@ exports.register = async (req, res) => {
         authorization: process.env.FAST2SMS_API_KEY,
         "Content-Type": "application/json",
       };
+      // console.log("fast2smsData", fast2smsData);
+      // console.log("fast2smsHeaders", fast2smsHeaders);
       const response = await fetch(
         "https://www.fast2sms.com/dev/bulkV2",
         {
@@ -96,7 +101,7 @@ exports.register = async (req, res) => {
           headers: fast2smsHeaders
         }
       );
-      // console.log(response);
+      // console.log("response", response);
       if (response.status === 200) {
         res.status(201).json({
           message: 'User registered successfully. Please verify your phone number.',
@@ -104,6 +109,7 @@ exports.register = async (req, res) => {
       }
     }
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
