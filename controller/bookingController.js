@@ -236,3 +236,14 @@ exports.getBookingByUserId=async(req,res)=>{
     res.status(500).json({error:err.message});
   }
 }
+
+exports.getExploreBookings=async(req,res)=>{
+  try{
+    const {location,checkInDate,checkOutDate,adults,children}=req.body;
+    const properties=await Property.find({location});
+    res.status(200).json({success:true,properties});
+  }
+  catch(err){
+    res.status(500).json({error:err.message});
+  }
+}

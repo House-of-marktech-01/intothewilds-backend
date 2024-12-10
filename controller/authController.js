@@ -227,8 +227,8 @@ exports.googleSignup = async (req, res) => {
     const response = req.body;
     const clientId = response.clientId;
     const clientCredentials = response.credential;
-    const user = await User.findOne({ clientId: clientId });
-    console.log(user);
+    const jwtDecode = jwt.decode(clientCredentials);
+    const user = await User.findOne({ email: jwtDecode.email });
     if (user) {
       const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
       return res.status(200).json({
@@ -245,7 +245,6 @@ exports.googleSignup = async (req, res) => {
         message: "Signed in successfully"
       });
     }
-    const jwtDecode = jwt.decode(clientCredentials);
     const newUser = new User({
       email: jwtDecode.email,
       name: jwtDecode.name,

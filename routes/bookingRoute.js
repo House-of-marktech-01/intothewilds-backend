@@ -10,6 +10,7 @@ router.post('/new-booking', bookingController.createBooking);
 
 // Get all bookings (Admin only)
 router.get('/get-all-bookings' ,authenticateToken, authorizeRole('admin') , bookingController.getBookings);
+router.get('/explore-bookings',bookingController.getExploreBookings);
 
 // Update booking status (admin only)
 router.put('/update/:id',authenticateToken, authorizeRole('admin') , bookingController.updateBookingStatus);
