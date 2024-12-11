@@ -26,8 +26,69 @@ const editProperty = async (req, res) => {
     res.status(200).json({ message: "Property updated successfully", property: property });
 };
 
+
+const addProperty = async (req, res) => {
+    const { name, 
+        price,
+        guestCapacity ,
+        maximumCapacity,
+        images,
+        amenities,
+        bookingPolicies,
+        cancellationPolicies,
+        faqs,
+        tags,
+        location,
+        address,
+        rating,
+        reviews,
+        numberOfCottages,
+        locationLink,
+        description} = req.body;
+        const numberguestCapacity = Number(guestCapacity);
+       const  numbermaximumCapacity = Number(maximumCapacity);
+        const numbernumberOfCottages = Number(numberOfCottages);
+        const numberrating = Number(rating);
+       const  numberreviews = Number(reviews);
+        const numberprice = Number(price);
+    const property = new Properties({ 
+        name, 
+        price:numberprice,
+        guestCapacity :numberguestCapacity,
+        maximumCapacity:numbermaximumCapacity,
+        images,
+        amenities,
+        bookingPolicies,
+        cancellationPolicies,
+        faqs,
+        tags,
+        location,
+        address,
+        rating:numberrating,
+        reviews:numberreviews,
+        bedroom:numbernumberOfCottages,
+        locationLink,
+        description
+    });
+    await property.save();
+    res.status(200).json({ message: "Property added successfully", property: property });
+};
+
+
+const deleteProperty = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Properties.findByIdAndDelete(id);
+        res.status(200).json({ message: "Property deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getProperties,
     getPropertyById,
-    editProperty
+    editProperty,   
+    addProperty,
+    deleteProperty
 };
