@@ -12,11 +12,15 @@ const cors = require("cors");
 const propertyListingQueryRoutes = require("./routes/propertyListingQueryRoutes");
 const toursQueryRoutes = require("./routes/toursQueryRoutes");
 const eventQueryRoutes = require("./routes/eventQueryRoutes");
-
+const rateLimiter = require("express-rate-limit");
 dotenv.config();
 
 const app = express();
-
+app.use(rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again after 15 minutes"
+}));
 app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],

@@ -37,10 +37,52 @@ exports.register = async (req, res) => {
     // console.log(existingUser);
     if (existingUser) {
       if (existingUser.email === emailorphone) {
-        return res.status(400).json({ error: 'Email is already registered.' });
+        if(!existingUser.isVerified){
+          const otp = generateOTP();
+          existingUser.otp = otp;
+          existingUser.otpGeneratedAt = Date.now();
+          await existingUser.save();
+          await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: emailorphone,
+            subject: 'Verify Your Email Address',
+            html: `<p>Hello ${name},</p>
+                 <p>Thank you for registering. Please verify your email address by entering the otp below:</p>
+                 <p><strong>${otp}</strong></p>
+                 <p>This otp is valid for 10 mins.</p>`,
+          });
+          return res.status(201).json({ message: 'Email is already registered. Please verify your email to log in. OTP sent to your email.' });
+        }
+        else{
+          return res.status(400).json({ error: 'Email is already registered.' });
+        }
       }
       else {
-        return res.status(400).json({ error: 'Phone number is already registered.' });
+        const otp = generateOTP();
+        existingUser.otp = otp;
+        existingUser.otpGeneratedAt = Date.now();
+        await existingUser.save();
+        const formattedPhone = formatContactNumber(existingUser.phone);
+        const fast2smsData = {
+          route: "otp",
+          variables_values: otp,
+          numbers: formattedPhone,
+        };
+        const fast2smsHeaders = {
+          authorization: process.env.FAST2SMS_API_KEY,
+          "Content-Type": "application/json",
+        };
+        const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+          method: "POST",
+          body: JSON.stringify(fast2smsData),
+          headers: fast2smsHeaders
+        });
+        if (response.status === 200) {
+          return res.status(201).json({ message: 'Phone number is already registered. Please verify your phone number to log in. OTP sent to your phone number.' });
+        }
+        else {
+          return res.status(400).json({ error: 'Failed to send OTP to your phone number.' });
+        }
       }
     }
 
@@ -137,7 +179,22 @@ exports.login = async (req, res) => {
 
     // Check if email is verified
     if (!user.isVerified) {
-      return res.status(403).json({ error: 'Please verify your email to log in.' });
+      const otp = generateOTP();
+      user.otp = otp;
+      user.otpGeneratedAt = Date.now();
+      await user.save();
+      if (user.email) {
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: user.email,
+          subject: 'Verify Your Email Address',
+          html: `<p>Hello ${user.name},</p>
+               <p>Thank you for registering. Please verify your email address by entering the otp below:</p>
+               <p><strong>${otp}</strong></p>
+               <p>This otp is valid for 10 mins.</p>`,
+        });
+      }
+      return res.status(204).json({ message: 'Please verify your email to log in. OTP sent to your email.' });
     }
 
     // Generate JWT for login
