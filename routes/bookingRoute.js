@@ -10,6 +10,7 @@ router.post('/new-booking', bookingController.createBooking);
 
 // Get all bookings (Admin only)
 router.get('/get-all-bookings' ,authenticateToken, authorizeRole('admin') , bookingController.getBookings);
+router.get('/userbookings',authenticateToken,bookingController.getuserbookings);
 router.get('/explore-bookings',bookingController.getExploreBookings);
 
 // Update booking status (admin only)
@@ -25,5 +26,6 @@ router.get('/getBookings',bookingController.getAllBookings);
 router.get('/getBookings/:id',bookingController.getBookingByUserId);
 // Update booking status (admin only)
 router.post('/:id/status', bookingController.updateBookingStatus);
+
 
 module.exports = router;

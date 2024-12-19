@@ -17,7 +17,7 @@ exports.propertyListingQueryController = async (req, res) => {
   const { name, email, phone, message } = req.body;
   const propertyListingQuery = new PropertyListingQuery({ name, email, phone, propertyDetails:message });
   await propertyListingQuery.save();
-  console.log(propertyListingQuery);
+  // console.log(propertyListingQuery);
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
