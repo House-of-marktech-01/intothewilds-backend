@@ -3,7 +3,7 @@ const Properties = require("../models/Properties");
 const getProperties = async (req, res) => {
     try {
         const properties = await Properties.find();
-        res.status(200).json({message: "Properties fetched successfully", properties: properties});
+        res.status(200).json({ message: "Properties fetched successfully", properties: properties });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -13,7 +13,7 @@ const getPropertyById = async (req, res) => {
     const { id } = req.params;
     try {
         const property = await Properties.findById(id);
-        res.status(200).json({message: "Property fetched successfully", property: property});
+        res.status(200).json({ message: "Property fetched successfully", property: property });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -21,16 +21,16 @@ const getPropertyById = async (req, res) => {
 
 const editProperty = async (req, res) => {
     const { id } = req.params;
-    const { name, price,guestCapacity ,maximumCapacity} = req.body;
-    const property = await Properties.findByIdAndUpdate(id, { name, price,guestCapacity ,maximumCapacity});
+    const { name, price, guestCapacity, maximumCapacity } = req.body;
+    const property = await Properties.findByIdAndUpdate(id, { name, price, guestCapacity, maximumCapacity });
     res.status(200).json({ message: "Property updated successfully", property: property });
 };
 
 
 const addProperty = async (req, res) => {
-    const { name, 
+    const { name,
         price,
-        guestCapacity ,
+        guestCapacity,
         maximumCapacity,
         images,
         amenities,
@@ -44,18 +44,18 @@ const addProperty = async (req, res) => {
         reviews,
         numberOfCottages,
         locationLink,
-        description} = req.body;
-        const numberguestCapacity = Number(guestCapacity);
-       const  numbermaximumCapacity = Number(maximumCapacity);
-        const numbernumberOfCottages = Number(numberOfCottages);
-        const numberrating = Number(rating);
-       const  numberreviews = Number(reviews);
-        const numberprice = Number(price);
-    const property = new Properties({ 
-        name, 
-        price:numberprice,
-        guestCapacity :numberguestCapacity,
-        maximumCapacity:numbermaximumCapacity,
+        description } = req.body;
+    const numberguestCapacity = Number(guestCapacity);
+    const numbermaximumCapacity = Number(maximumCapacity);
+    const numbernumberOfCottages = Number(numberOfCottages);
+    const numberrating = Number(rating);
+    const numberreviews = Number(reviews);
+    const numberprice = Number(price);
+    const property = new Properties({
+        name,
+        price: numberprice,
+        guestCapacity: numberguestCapacity,
+        maximumCapacity: numbermaximumCapacity,
         images,
         amenities,
         bookingPolicies,
@@ -64,9 +64,9 @@ const addProperty = async (req, res) => {
         tags,
         location,
         address,
-        rating:numberrating,
-        reviews:numberreviews,
-        bedroom:numbernumberOfCottages,
+        rating: numberrating,
+        reviews: numberreviews,
+        bedroom: numbernumberOfCottages,
         locationLink,
         description
     });
@@ -88,7 +88,7 @@ const deleteProperty = async (req, res) => {
 module.exports = {
     getProperties,
     getPropertyById,
-    editProperty,   
+    editProperty,
     addProperty,
     deleteProperty
 };
