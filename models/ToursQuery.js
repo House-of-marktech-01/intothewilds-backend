@@ -5,6 +5,11 @@ const toursQuerySchema = new mongoose.Schema({
   email: String,
   phone: String,
   message: String,
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+  tourName: String,
 });
 
 const ToursQuery = mongoose.model("ToursQuery", toursQuerySchema);

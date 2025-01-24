@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 exports.createToursQuery = async (req, res) => {
     try {
-        const { name, email, phone, message } = req.body;
+        const { name, email, phone, message, date, tourName } = req.body;
         const toursQuery = new ToursQuery({ name, email, phone, message });
         await toursQuery.save();
 
@@ -23,6 +23,8 @@ exports.createToursQuery = async (req, res) => {
         subject: 'Tours Query',
         html: `<p>Thank you ${name} for reaching out!</p>
                <p>Your message: ${message}</p>
+               ${date ? `<p>Date: ${date}</p>` : ''}
+               ${tourName ? `<p>Tour Name: ${tourName}</p>` : ''}
                <p>We will get back to you shortly.</p>`,
     });
    await transporter.sendMail({
@@ -32,7 +34,9 @@ exports.createToursQuery = async (req, res) => {
     html: `<p>New tours query received from ${name}</p>
            <p>Email: ${email}</p>
            <p>Phone: ${phone}</p>
-           <p>Message: ${message}</p>`,
+           <p>Message: ${message}</p>
+           ${date ? `<p>Date: ${date}</p>` : ''}
+           ${tourName ? `<p>Tour Name: ${tourName}</p>` : ''}`,
    });
     res.status(200).json({ message: "Tours query saved successfully" });
 } catch (error) {
