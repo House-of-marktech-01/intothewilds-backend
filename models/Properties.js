@@ -32,6 +32,9 @@ const propertySchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  cottage:{
+    type: Boolean,
+  },
   bedroom: {
     type: Number,
     required: true
