@@ -63,7 +63,7 @@ exports.createBooking = async (req, res) => {
     razorpay.orders.create(options, async (error, order) => {
       if (error) {
           console.error("Error creating order:", error);
-          return res.status(500).send({ message: "Something went wrong" });
+          return res.status(400).json({ message: error.error.description });
       }
       const newBooking = new Booking({
         user,
