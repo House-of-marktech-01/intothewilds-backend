@@ -13,6 +13,7 @@ const propertyListingQueryRoutes = require("./routes/propertyListingQueryRoutes"
 const toursQueryRoutes = require("./routes/toursQueryRoutes");
 const eventQueryRoutes = require("./routes/eventQueryRoutes");
 const reviewsRoutes = require("./routes/reviewRoutes");
+const airbnbRoutes = require("./routes/calendarRoutes");
 const rateLimiter = require("express-rate-limit");
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use("/api/v1/propertyListingQuery", propertyListingQueryRoutes);
 app.use("/api/v1/toursQuery", toursQueryRoutes);
 app.use("/api/v1/eventQuery", eventQueryRoutes);
 app.use("/api/v1/reviews", reviewsRoutes);
+app.use("/api/v1/calendar",airbnbRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
